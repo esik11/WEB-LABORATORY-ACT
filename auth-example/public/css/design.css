@@ -1,0 +1,233 @@
+/* General Body Styles */
+body {
+    background-color: #f3f4f6;
+    font-family: 'Nunito', sans-serif;
+    color: #374151;
+    line-height: 1.6;
+}
+
+/* Container Styles */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styles */
+form {
+    background-color: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+form label {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+textarea, input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    transition: border-color 0.3s;
+}
+
+textarea:focus, input:focus {
+    border-color: #60a5fa;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.4);
+}
+
+/* Button Styles */
+button {
+    background-color: #3b82f6;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+button:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.icon {
+    font-size: 1.25rem;
+    display: inline-block;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    border-radius: 0.375rem;
+    color: #16a34a;
+    background-color: #d1fae5;
+    border: 1px solid #16a34a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Post Card Styles */
+.post-card {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.3s;
+}
+
+.post-card:hover {
+    background-color: #f9fafb;
+}
+
+.post-card h3 {
+    color: #1e3a8a;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.post-card p {
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+}
+
+/* User Avatar Styles */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0.75rem;
+}
+
+/* Like Button Styles */
+.like-button {
+    background-color: #e0f2fe;
+    color: #0284c7;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.like-button:hover {
+    background-color: #bae6fd;
+    color: #0369a1;
+}
+
+/* Comment Section Styles */
+.comment-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.comment-section h4 {
+    color: #1f2937;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+/* Individual Comment Box */
+.comment {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.comment-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0.5rem;
+}
+
+.comment p {
+    color: #4b5563;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.comment span {
+    color: #6b7280;
+    font-style: italic;
+    font-size: 0.75rem;
+}
+
+/* Floating Action Button (FAB) for Adding Posts */
+.fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: #3b82f6;
+    color: #ffffff;
+    padding: 1rem;
+    border-radius: 50%;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.fab:hover {
+    background-color: #2563eb;
+    transform: scale(1.1);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    button {
+        width: 100%;
+        padding: 0.75rem;
+    }
+}
+
+/* Icons */
+.icon-like {
+    color: #ef4444;
+    font-size: 1rem;
+}
+
+.icon-comment {
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+.icon-edit {
+    color: #1d4ed8;
+    font-size: 0.875rem;
+}
+
+.icon-delete {
+    color: #b91c1c;
+    font-size: 0.875rem;
+}
