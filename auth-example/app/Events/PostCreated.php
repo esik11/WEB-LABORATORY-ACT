@@ -1,57 +1,57 @@
 <?php
 
+// app/Events/PostCreated.php
+
 namespace App\Events;
+
 use App\Models\Post;
 use App\Models\User;
-use App\Models\Notifications;
+use App\Models\Notification; // Import the Notification model
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class PostCreated implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use InteractsWithSockets, SerializesModels;
 
-    public $user;
     public $post;
+    public $user;
 
-    /**
-     * Create a new event instance.
-     *
-     * @param User $user
-     * @param Post $post
-     */
     public function __construct(User $user, Post $post)
     {
         $this->user = $user;
         $this->post = $post;
+
+        // Create a new notification for the post creation
+        $notification = new Notification();
+        $notification->user_id = $user->id;
+        $notification->post_id = $post->id; // Link to the post
+        $notification->type = 'post'; // Set type
+        $notification->is_read = false; // Set as unread
+        $notification->save(); // Save to get a unique ID
+
+        // Optionally log the creation
+        \Log::info('Created notification for post', ['notification_id' => $notification->id]);
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
+    // The channel on which the event will be broadcast
     public function broadcastOn()
     {
-        return new PrivateChannel('post.' . $this->post->id);
+        return new Channel('notifications');
     }
 
-    /**
-     * Get the data to broadcast.
-     *
-     * @return array
-     */
+    // Customize the broadcasted data
     public function broadcastWith()
     {
         return [
+            'notification_id' => $this->post->id, // Use the unique notification ID
             'user_id' => $this->user->id,
-            'post_id' => $this->post->id,
+            'name' => $this->user->name,
             'message' => 'New post created by ' . $this->user->name,
+            'post_id' => $this->post->id,
+            'time' => now()->toDateTimeString(),
         ];
     }
 }

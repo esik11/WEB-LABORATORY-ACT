@@ -9,6 +9,7 @@ use App\Models\Profile;
 use App\Models\Notification;
 use App\Models\User;
 use App\Events\PostCreated;
+use Illuminate\Support\Facades\Broadcast;
 class PostController extends Controller
 {
     /**
@@ -50,7 +51,7 @@ class PostController extends Controller
     $post->save();
 
     // Dispatch the PostCreated event after the post is saved
-    event(new PostCreated(Auth::user(), $post)); // Ensure the event is fired with correct data
+    broadcast(new PostCreated(Auth::user(), $post))->toOthers(); // Ensure the event is fired with correct data
 
     // Log the event dispatch for debugging purposes
     Log::info('PostCreated event dispatched', [

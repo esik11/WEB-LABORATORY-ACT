@@ -64,40 +64,26 @@ $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
     });
    // Real-time post creation handler
    channel.bind('App\\Events\\PostCreated', function(data) {
-    // Log the PostCreated event data for debugging purposes
-    console.log("Post Created Notification Data Received:", data);
+    console.log("Post Notification Data Received:", data); // Log received data
+    if ($scope.loggedInUser && $scope.loggedInUser.id === data.user_id) return;
 
-    const post = {
-        id: data.post_id,
-        user_id: data.user_id,
-        user: { name: data.name },
-        content: data.message,
-        time: data.time
-    };
-    
-    // Add the new post to the list of posts
-    $scope.posts.push(post);
-
-    // Create a notification for the new post
+    // Create notification for post creation
     const notification = {
-        id: new Date().getTime(),
+        id: data.notification_id,
         post_id: data.post_id,
         user_id: data.user_id,
-        username: data.name,
-        message: `New post created by ${data.name}: "${data.message}"`,
+        username: data.username,
+        message: data.message,
         time: new Date(data.time).toLocaleTimeString(),
         is_read: false
     };
 
-    // Add the notification and update unread count
+    console.log("New Post Notification Created:", notification); // Log new notification
+
+    // Update notifications
     $scope.notifications.push(notification);
     $scope.unreadCount++;
     localStorage.setItem('notifications', JSON.stringify($scope.notifications));
-
-    // Log the updated notifications array (optional for debugging)
-    console.log("Updated Notifications Array:", $scope.notifications);
-
-    // Ensure the view updates
     $scope.$apply();
 });
 
