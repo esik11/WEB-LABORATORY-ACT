@@ -60,33 +60,44 @@ $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
             });
         }
 
-        $scope.$apply(); // Ensure the UI updates
+        $timeout(function() {
+            $scope.$digest();
+        }, 0); // Ensure the UI updates
     });
    // Real-time post creation handler
-   channel.bind('App\\Events\\PostCreated', function(data) {
-    console.log("Post Notification Data Received:", data); // Log received data
+   channel.bind('post.created', function(data) {
+    console.log("Post Notification Data Received:", data);
+    console.log("Logged-in User ID:", $scope.currentUserId);
+    console.log("Notification User ID:", data.user_id);
+  
+
     if ($scope.loggedInUser && $scope.loggedInUser.id === data.user_id) return;
 
-    // Create notification for post creation
+    // Use the notification_id from backend instead of generating one
     const notification = {
-        id: data.notification_id,
+        id: data.notification_id, // Use backend-generated ID
         post_id: data.post_id,
         user_id: data.user_id,
-        username: data.username,
+        username: data.name,
         message: data.message,
         time: new Date(data.time).toLocaleTimeString(),
-        is_read: false
+        is_read: false,
     };
 
-    console.log("New Post Notification Created:", notification); // Log new notification
-
+    console.log("New Post Notification Created:", notification);
+    console.log("Notification ID:", notification.id);
     // Update notifications
     $scope.notifications.push(notification);
     $scope.unreadCount++;
-    localStorage.setItem('notifications', JSON.stringify($scope.notifications));
-    $scope.$apply();
-});
 
+    // Save notifications in localStorage
+    localStorage.setItem('notifications', JSON.stringify($scope.notifications));
+
+    // Update the view
+    $timeout(function() {
+        $scope.$digest();
+    }, 0);
+});
 
     // Function to create a new post
     $scope.createPost = function() {
@@ -136,7 +147,9 @@ $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
         }
     
         // Update the view
-        $scope.$apply();
+        $timeout(function() {
+            $scope.$digest();
+        }, 0);
     });
     
     // Function to load posts from the server
@@ -276,20 +289,25 @@ $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
     };
     
     $scope.markAsRead = function(notification) {
-        notification.is_read = true;
-        $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
+        console.log("Marking Notification as Read:", notification);
     
-        $http.post('/notifications/' + notification.id + '/mark-as-read')
-            .then(function(response) {
-                console.log('Notification marked as read:', response.data);
-                // Update localStorage
-                localStorage.setItem('notifications', JSON.stringify($scope.notifications));
-            })
-            .catch(function(error) {
-                console.error('Error marking notification as read:', error);
-            });
+        if (notification && notification.id) {
+            // Proceed to mark as read using the correct ID from your database (the notification ID)
+            $http.post(`/notifications/${notification.id}/mark-as-read`)
+                .then(function(response) {
+                    console.log("Success:", response.data);
+                    notification.is_read = true; // Update local state to mark as read
+                    $scope.unreadCount--; // Decrease unread count
+                })
+                .catch(function(error) {
+                    console.error("Error marking notification as read:", error);
+                    alert("Failed to mark notification as read. Please try again.");
+                });
+        } else {
+            console.error("Notification ID is undefined");
+            alert("Notification ID is missing. Please refresh the page and try again.");
+        }
     };
-    
     
     $scope.clearNotifications = function() {
         // Clear notifications from the front-end
@@ -305,8 +323,6 @@ $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
                 console.log("Error clearing notifications:", error);
             });
     };
-    
-    
     
 
     // Function to open the edit form for a post

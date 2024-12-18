@@ -29,41 +29,42 @@ class PostController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
-{
-    // Validate incoming request data
-    $request->validate([
-        'content' => 'required|string',
-        'image' => 'nullable|image|max:2048', // Optional image upload validation
-    ]);
+    {
+        // Validate incoming request data
+        $request->validate([
+            'content' => 'required|string',
+            'image' => 'nullable|image|max:2048', // Optional image upload validation
+        ]);
+    
+        // Create a new post instance
+        $post = new Post();
+        $post->content = $request->content;
+        $post->user_id = Auth::id(); // Associate post with authenticated user
+    
+        // Handle image upload if provided
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('posts', 'public');
+            $post->image = $path; // Save image path in database
+        }
+    
+        // Save the post to the database
+        $post->save();
+    
+        // Dispatch the PostCreated event after the post is saved
+ broadcast(new PostCreated(Auth::user(), $post))->toOthers();
 
-    // Create a new post instance
-    $post = new Post();
-    $post->content = $request->content;
-    $post->user_id = Auth::id(); // Associate post with authenticated user
-
-    // Handle image upload if provided
-    if ($request->hasFile('image')) {
-        $path = $request->file('image')->store('posts', 'public');
-        $post->image = $path; // Save image path in database (if you add an image field to your posts table)
+    
+        // Log the event dispatch for debugging purposes
+        \Log::info('PostCreated event dispatched', [
+            'user_id' => Auth::id(),
+            'post_id' => $post->id,
+            'message' => 'New post created by ' . Auth::user()->name,
+        ]);
+    
+        // Return a JSON response indicating success
+        return response()->json(['message' => 'Post created successfully!'], 201);
     }
-
-    // Save the post to the database
-    $post->save();
-
-    // Dispatch the PostCreated event after the post is saved
-    broadcast(new PostCreated(Auth::user(), $post))->toOthers(); // Ensure the event is fired with correct data
-
-    // Log the event dispatch for debugging purposes
-    Log::info('PostCreated event dispatched', [
-        'user_id' => Auth::id(),
-        'post_id' => $post->id,
-        'message' => 'New post created by ' . Auth::user()->name,
-    ]);
-
-    // Return a JSON response indicating success
-    return response()->json(['message' => 'Post created successfully!'], 201);
-}
-
+    
 
     /**
      * Display a listing of posts.

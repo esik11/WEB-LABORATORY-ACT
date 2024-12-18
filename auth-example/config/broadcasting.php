@@ -15,7 +15,8 @@ return [
     |
     */
 
-    'default' => env('BROADCAST_CONNECTION', 'null'),
+'default' => env('BROADCAST_DRIVER', 'pusher'), // Or 'redis'
+
 
     /*
     |--------------------------------------------------------------------------

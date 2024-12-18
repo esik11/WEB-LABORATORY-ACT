@@ -34,11 +34,14 @@ Route::delete('/posts/{id}', [PostController::class, 'destroy']);
 Route::get('/posts', [LikeController::class, 'index']);
 Route::post('/likes', [LikeController::class, 'toggleLike']);  // Use POST for toggle like/unlike
 
-Route::get('/notifications/unread', [NotificationController::class, 'fetchUnreadNotifications']);
-Route::get('/notifications/all', [NotificationController::class, 'fetchAllNotifications']);
-Route::post('notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead']);
-Route::post('/clear-notifications', [NotificationController::class, 'clearNotifications'])->name('clear-notifications');
+Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead']);
 
+// Route to fetch unread notifications
+Route::get('notifications/unread', [NotificationController::class, 'fetchUnreadNotifications']);
+// Route to fetch all notifications
+Route::get('notifications/all', [NotificationController::class, 'fetchAllNotifications']);
+// Route to clear all notifications
+Route::post('/clear-notifications', [NotificationController::class, 'clearNotifications'])->name('clear-notifications');
 
 
 });

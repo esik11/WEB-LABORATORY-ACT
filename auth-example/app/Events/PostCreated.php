@@ -1,56 +1,60 @@
 <?php
 
-// app/Events/PostCreated.php
-
 namespace App\Events;
 
 use App\Models\Post;
 use App\Models\User;
-use App\Models\Notification; // Import the Notification model
+use App\Models\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Support\Facades\Log;
 
 class PostCreated implements ShouldBroadcast
 {
     use InteractsWithSockets, SerializesModels;
 
-    public $post;
+    public $notification;
     public $user;
+    public $post;
 
     public function __construct(User $user, Post $post)
     {
         $this->user = $user;
         $this->post = $post;
-
-        // Create a new notification for the post creation
+        $this->post->save(); // Save post first
+    
+        // Check existing notifications
         $notification = new Notification();
         $notification->user_id = $user->id;
-        $notification->post_id = $post->id; // Link to the post
-        $notification->type = 'post'; // Set type
-        $notification->is_read = false; // Set as unread
-        $notification->save(); // Save to get a unique ID
-
-        // Optionally log the creation
-        \Log::info('Created notification for post', ['notification_id' => $notification->id]);
+        $notification->post_id = $post->id;
+        $notification->type = 'post';
+        $notification->is_read = false;
+        $notification->save();
+        Log::info('Notification created', ['id' => $notification->id]);
+        $this->notification = $notification;
     }
 
-    // The channel on which the event will be broadcast
     public function broadcastOn()
     {
         return new Channel('notifications');
     }
 
-    // Customize the broadcasted data
+    public function broadcastAs()
+    {
+        return 'post.created';
+    }
+
     public function broadcastWith()
     {
+        Log::info('Broadcasting notification', ['id' => $this->notification->id]);
         return [
-            'notification_id' => $this->post->id, // Use the unique notification ID
+            'notification_id' => $this->notification->id, // Use actual notification ID
             'user_id' => $this->user->id,
             'name' => $this->user->name,
             'message' => 'New post created by ' . $this->user->name,
-            'post_id' => $this->post->id,
+            'post_id' => $this->notification->post_id,
             'time' => now()->toDateTimeString(),
         ];
     }

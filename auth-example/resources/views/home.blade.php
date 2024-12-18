@@ -10,7 +10,7 @@
     <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
         <li id="notification-list">
             <div ng-repeat="notification in notifications track by $index">
-                <a class="dropdown-item" href="#" ng-click="markAsRead(notification)">
+                <a class="dropdown-item" ng-click="markAsRead(notification)">
                     @{{ notification.username }} - @{{ notification.message }} (@{{ notification.time }})
                 </a>
             </div>

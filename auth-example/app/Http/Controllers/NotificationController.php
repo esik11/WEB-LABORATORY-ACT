@@ -30,8 +30,6 @@ class NotificationController extends Controller
     // Mark a specific notification as read
     public function markAsRead($id)
     {
-        \Log::info('Marking notification as read', ['id' => $id]);
-        
         $notification = Notification::find($id);
     
         if (!$notification) {
@@ -43,6 +41,7 @@ class NotificationController extends Controller
     
         return response()->json(['message' => 'Notification marked as read']);
     }
+    
     
     
     // Delete a specific notification
