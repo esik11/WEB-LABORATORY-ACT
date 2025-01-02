@@ -2,15 +2,17 @@
 
 @section('content')
 <div class="container mx-auto p-6" ng-app="postApp" ng-controller="PostController">
-    <!-- Notification Dropdown -->
-    <div class="dropdown mb-4">
+ <!-- Notification Dropdown -->
+<div class="dropdown mb-4">
     <button class="btn btn-primary dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         Notifications <span id="notification-count">@{{ unreadCount }}</span>
     </button>
     <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
         <li id="notification-list">
             <div ng-repeat="notification in notifications track by $index">
-                <a class="dropdown-item" ng-click="markAsRead(notification)">
+                <a class="dropdown-item" ng-click="markAsRead(notification)" ng-class="{'font-weight-bold': !notification.is_read}">
+                    <!-- Indicator for unread notifications -->
+                    <span ng-if="!notification.is_read" class="badge bg-danger me-2">New</span>
                     @{{ notification.username }} - @{{ notification.message }} (@{{ notification.time }})
                 </a>
             </div>

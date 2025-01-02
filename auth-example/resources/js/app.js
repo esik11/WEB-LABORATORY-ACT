@@ -25,25 +25,26 @@ $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
 
     channel.bind('App\\Events\\CommentAdded', function(data) {
         console.log("Comment Notification Data Received:", data);
+        
         if ($scope.loggedInUser && $scope.loggedInUser.id === data.user_id) return;
-
+    
         // Create notification for comment addition
         const notification = {
-            id: data.notification_id, // Add ID using comment ID
-            comment_id: data.comment_id,
+            id: data.notification_id,
+            comment_id: data.comment_id, // Use the comment ID from the event
             user_id: data.user_id,
-            username: data.user_name,
+            username: data.user_name, // Ensure this matches with PHP
             message: data.message,
             post_id: data.post_id,
             time: new Date(data.time).toLocaleTimeString(),
             is_read: false
         };
-
+    
         // Update notifications
         $scope.notifications.push(notification);
         $scope.unreadCount++;
         localStorage.setItem('notifications', JSON.stringify($scope.notifications));
-
+    
         // Find the post the comment belongs to and push the new comment to it
         const post = $scope.posts.find(p => p.id === data.post_id);
         if (post) {
@@ -59,11 +60,13 @@ $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
                 created_at: data.time
             });
         }
-
+    
+        // Trigger a digest cycle to update the UI
         $timeout(function() {
             $scope.$digest();
-        }, 0); // Ensure the UI updates
+        }, 0);
     });
+    
    // Real-time post creation handler
    channel.bind('post.created', function(data) {
     console.log("Post Notification Data Received:", data);
@@ -117,7 +120,7 @@ $scope.unreadCount = $scope.notifications.filter(n => !n.is_read).length;
     
         // Create notification for like
         const notification = {
-            id: new Date().getTime(), // Use timestamp as unique ID
+            id: data.notification_id, // Use the correct notification ID from backend
             post_id: data.post_id,
             user_id: data.user_id,
             username: data.user_name,

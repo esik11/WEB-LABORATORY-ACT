@@ -230,4 +230,12 @@ button:active {
 .icon-delete {
     color: #b91c1c;
     font-size: 0.875rem;
+
+}
+.badge {
+    font-size: 0.75rem; /* Smaller font size for badges */
+}
+
+.font-weight-bold {
+    font-weight: bold; /* Make unread notifications bold */
 }

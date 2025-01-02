@@ -4,41 +4,57 @@ namespace App\Listeners;
 
 use App\Events\CommentAdded;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use App\Models\Notification; // Ensure this is imported
+use App\Models\Notification;
+use App\Models\User;
+
 class SendCommentNotification implements ShouldQueue
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
     public function __construct()
     {
         //
     }
 
-    /**
-     * Handle the event.
-     *
-     * @param  \App\Events\CommentAdded  $event
-     * @return void
-     */
     public function handle(CommentAdded $event)
-{
-    \Log::info('Notification about comment added to post:', [
-        'user_id' => $event->post->user_id,
-        'post_id' => $event->post->id,
-        'type' => 'comment',
-    ]);
+    {
+        // Check for null values before accessing properties
+        if (!$event->user || !$event->post) {
+            \Log::error('CommentAdded event has null properties', [
+                'user' => $event->user,
+                'post' => $event->post,
+            ]);
+            return; // Exit if any required property is null
+        }
 
-    Notification::create([
-        'user_id' => $event->post->user_id,  // Notify the owner of the post
-        'post_id' => $event->post->id,
-        'type' => 'comment',
-        'is_read' => false,
-    ]);
+        // Log incoming event data
+        \Log::info('Handling CommentAdded event', [
+            'user_id' => $event->user->id,
+            'post_id' => $event->post->id,
+            'message' => 'New comment by ' . $event->user->name,
+        ]);
+
+        // Get post owner's user ID
+        $postOwnerId = $event->post->user_id;
+
+        // Check if post owner exists before creating notification
+        if (User::find($postOwnerId)) {
+            // Create a notification for post owner
+            Notification::create([
+                'user_id' => $postOwnerId,  // Notify the owner of the post
+                'post_id' => $event->post->id, // The post that was commented on
+                'comment_id' => optional($event)->comment ? $event->comment->id : null, // Store the comment ID for reference if needed
+                'type' => 'comment',
+                'is_read' => false,
+            ]);
+
+            \Log::info('Notification created for post owner', [
+                'notification_id' => optional($notification)->id,
+                'post_owner_id' => $postOwnerId,
+                'post_id' => $event->post->id,
+            ]);
+        } else {
+            \Log::error('Post owner not found for notification', [
+                'post_owner_id' => $postOwnerId,
+            ]);
+        }
+    }
 }
-
-}
-
